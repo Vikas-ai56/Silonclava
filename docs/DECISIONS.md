@@ -3464,3 +3464,42 @@ therefore could never have its webhook repaired. Chicken and egg.
 - `bin/tenant.mjs` segfaults on Node 18 (better-sqlite3 ABI) instead of
   reporting an unsupported version. The host default is 18; the service uses
   22.22.1. Not fixed here.
+
+## 2026-09-28 A lost provider callback cannot mute the agent indefinitely
+
+**Decision:** cron delivery passes `tenantId` to `sendText`, and a new
+`sweepStalledSends()` runs every 60s, moving any turn that has sat in
+`send_started` past `ROCKY_STALE_SEND_MS` (10 min) to `delivery_unknown` and
+waking the lane.
+
+**Why:** the first cron job this system ever delivered wedged the tenant for 23
+hours. `src/cron-ingress.mjs:81` called `channel.sendText(recipient, text)`
+without `tenantId` — the only send path that did. Without it the Twilio status
+callback URL carries no `?t=`, and `handleStatusWebhook` returns 204 with
+`reason: 'no tenant scope'` because it cannot tell whose turn it is. All six
+callbacks for that message were discarded that way. Every one of the 31
+tenant-less callbacks in the whole access log came from that single nine-second
+window; the other 1497 carried `?t=` and applied.
+
+The turn therefore never left `send_started`. One executing turn per tenant is
+the lane rule, so the next turn could not be claimed and five user messages
+coalesced behind it, unanswered. Twilio's own record says the message was `read`
+within eleven seconds — the user got the briefing; Rocky never learned it landed.
+
+`markSendStartedUnknown` already existed but only ran on shutdown and crash
+recovery. A process that keeps running never swept, so the wedge survived
+indefinitely and only a restart would have cleared it.
+
+**Rejected alternatives:**
+- *Mark it `completed`.* Acceptance is not delivery. `delivery_unknown` exists
+  precisely so a message that may already have been sent is never resent.
+- *Treat a tenant-less callback as the one warm tenant.* Guesses whose message
+  it is, and is wrong the moment two tenants are warm.
+- *Shorten the lane rule to let a queued turn overtake a sending one.* Breaks
+  ordering, which is the reason the rule exists.
+
+**Risks / edge cases found:**
+- The sweep is a backstop, not a delivery mechanism: a swept turn is reported as
+  unknown, because it genuinely is. The user may have received the message.
+- Ten minutes is generous against Twilio's usual seconds, so a slow-but-real
+  callback still wins. Tunable by `ROCKY_STALE_SEND_MS`.

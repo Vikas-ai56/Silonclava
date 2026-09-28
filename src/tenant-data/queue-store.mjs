@@ -480,6 +480,27 @@ export function listTurnsByState(store, states, limit = 200) {
  * `delivery_unknown`, because the provider may already have delivered it and it
  * must never be blindly resent.
  */
+export function staleSendStartedTurns(store, olderThanMs, { now = Date.now() } = {}) {
+  const cutoff = new Date(now - olderThanMs).toISOString();
+  return store.db
+    .prepare(
+      `SELECT id FROM turns
+        WHERE state = '${TURN_STATE.SEND_STARTED}' AND updated_at < ?`,
+    )
+    .all(cutoff)
+    .map((r) => r.id);
+}
+
+export function markOneSendStartedUnknown(store, turnId, reason) {
+  const at = nowIso();
+  return store.db
+    .prepare(
+      `UPDATE turns SET state = '${TURN_STATE.DELIVERY_UNKNOWN}', error_code = ?, updated_at = ?
+        WHERE id = ? AND state = '${TURN_STATE.SEND_STARTED}'`,
+    )
+    .run(reason, at, turnId).changes;
+}
+
 export function markSendStartedUnknown(store, reason = 'SHUTDOWN') {
   const at = nowIso();
   const info = store.db

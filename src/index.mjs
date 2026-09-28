@@ -21,6 +21,8 @@ import {
   tenantInFlight,
 } from './openclaw/tenant-gateway.mjs';
 import { readParsedBody, readBodyBytes } from './http-body.mjs';
+import { sweepStalledSends } from './inbound-queue.mjs';
+const STALE_SEND_SWEEP_MS = Number(process.env.ROCKY_STALE_SEND_SWEEP_MS || 60_000);
 import { tenantOpenclawStateDir } from './openclaw/tenant-openclaw.mjs';
 import { openTenantStore } from './tenant-data/store.mjs';
 import {
@@ -160,6 +162,15 @@ configureActivationDelivery({
     inFlight: (id) => tenantInFlight(id) > 0,
   });
   startWakeScheduler();
+
+  const staleSendTimer = setInterval(() => {
+    try {
+      sweepStalledSends();
+    } catch (err) {
+      console.warn('[queue] stale-send sweep failed:', err?.message || err);
+    }
+  }, STALE_SEND_SWEEP_MS);
+  if (typeof staleSendTimer.unref === 'function') staleSendTimer.unref();
 }
 // §6 validity condition: with write-capable tools reachable, an interrupted
 // turn must not be silently re-executed.

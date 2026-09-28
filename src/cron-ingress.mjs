@@ -78,7 +78,7 @@ export async function handleCronDelivery(payload, channel, tenantId) {
       return { ok: true, status: 200, body: { delivered: false, reason: 'send-already-started', turnId: saved.turnId } };
     }
     try {
-      const receipt = await channel.sendText(recipient, text);
+      const receipt = await channel.sendText(recipient, text, { tenantId: resolved });
       recordSendResult(store, saved.turnId, saved.messageId, attempt, {
         ok: receipt?.ok !== false,
         providerMessageId: receipt?.providerMessageId ?? null,

@@ -20,6 +20,8 @@ import {
   StaleTurnResultError,
   recoverInterruptedTurns,
   markSendStartedUnknown,
+  markOneSendStartedUnknown,
+  staleSendStartedTurns,
   queueDepth,
   hasWork,
 } from './tenant-data/queue-store.mjs';
@@ -272,6 +274,25 @@ export function wakeTenantLane(tenantId) {
   if (!hasWork(lanes.get(tenantId).store)) return false;
   wake(tenantId);
   return true;
+}
+
+export const STALE_SEND_MS = Number(process.env.ROCKY_STALE_SEND_MS || 10 * 60_000);
+
+export function sweepStalledSends({ olderThanMs = STALE_SEND_MS, now = Date.now() } = {}) {
+  let settled = 0;
+  for (const [tenantId, entry] of lanes) {
+    for (const turnId of staleSendStartedTurns(entry.store, olderThanMs, { now })) {
+      if (!markOneSendStartedUnknown(entry.store, turnId, 'NO_PROVIDER_STATUS')) continue;
+      settled += 1;
+      console.warn(
+        `[queue] ${tenantId}: turn ${turnId} sat in send_started for over ` +
+          `${Math.round(olderThanMs / 60_000)}m with no provider status — marked ` +
+          'delivery_unknown so the lane can move. The message may well have been delivered.',
+      );
+    }
+    if (settled && hasWork(entry.store)) wake(tenantId);
+  }
+  return settled;
 }
 
 export function recoverTenantLane(tenantId, options = {}) {

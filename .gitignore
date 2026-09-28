@@ -1,0 +1,40 @@
+node_modules/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.py[cod]
+.env
+.env.local
+.env.production
+.env.*.local
+*.log
+
+# Machine-local config (phones, tunnels, secrets) — copy from *.example
+rocky.config.json
+rocky.config.local.json
+
+pd-mcp-shim.debug.log
+
+# Runtime tenant data and Baileys sessions (never commit)
+tenants/
+auth_info*/
+baileys_auth*/
+*.session
+ops/
+platform/
+.self-lids.json
+**/self-lids.json
+**/qr.png
+**/creds.json
+
+# Project-local OpenClaw (if ever used at repo root; per-tenant lives under tenants/)
+.openclaw/
+.openclaw-*/
+
+*.zip
+rocky.zip
+graphify-out/
+
+!.env.example
+!rocky.config.example.json
+services/composio-connector/.venv/

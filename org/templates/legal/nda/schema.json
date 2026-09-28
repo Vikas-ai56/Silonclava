@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BugleRock Mutual NDA Fields",
+  "description": "Fillable slots for the BugleRock mutual NDA template. Every key MUST be present; values are validated for type and format. Any extra field not listed here is rejected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "counterparty_name",
+    "counterparty_email",
+    "term_years",
+    "effective_date",
+    "governing_law"
+  ],
+  "properties": {
+    "counterparty_name": {
+      "type": "string",
+      "description": "Full legal name of the counterparty (individual or entity).",
+      "minLength": 2,
+      "maxLength": 200
+    },
+    "counterparty_email": {
+      "type": "string",
+      "description": "Contact email for legal notices.",
+      "format": "email",
+      "maxLength": 200
+    },
+    "term_years": {
+      "type": "integer",
+      "description": "Initial confidentiality term in years.",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "effective_date": {
+      "type": "string",
+      "description": "Effective date in ISO 8601 (YYYY-MM-DD).",
+      "format": "date"
+    },
+    "governing_law": {
+      "type": "string",
+      "description": "Governing-law jurisdiction.",
+      "enum": ["Singapore", "India", "Delaware"]
+    },
+    "signatory_name": {
+      "type": "string",
+      "description": "Name of the BugleRock signatory for THIS document. Optional — omit to leave a blank signature rule for wet/e-signature. Free text: not restricted to the rules.yaml signatories list, which is advisory only.",
+      "minLength": 2,
+      "maxLength": 120
+    },
+    "signatory_title": {
+      "type": "string",
+      "description": "Title of the BugleRock signatory for THIS document (e.g. 'Director'). Optional — omit to leave a blank title rule.",
+      "minLength": 2,
+      "maxLength": 120
+    }
+  }
+}

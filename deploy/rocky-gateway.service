@@ -1,0 +1,19 @@
+[Unit]
+Description=Rocky OpenClaw Gateway (BugleRock WhatsApp agent)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/rocky
+ExecStart=/home/ubuntu/.nvm/versions/node/v22.22.1/bin/node src/index.mjs
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=40
+StandardOutput=append:/home/ubuntu/rocky/logs/rocky.log
+StandardError=append:/home/ubuntu/rocky/logs/rocky.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,23 @@
+# Never sync to a deployment. Each entry is environment-specific state that the
+# target owns; copying the local copy over it silently destroys the target's.
+#
+# platform/ is the one that bites hardest: it holds the vault records and
+# runtime secrets, encrypted with THAT environment's ROCKY_VAULT_MASTER_KEY.
+# Overwriting prod's with a laptop's produces "Vault key mismatch" on every
+# credential read, and a deploy is the last place anyone looks.
+platform/
+tenants/
+.env.local
+.env
+node_modules/
+.git/
+ops/
+logs/
+*.log
+.DS_Store
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+playground/

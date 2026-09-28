@@ -1,0 +1,35 @@
+{
+  "name": "rocky-ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Rocky AI \u2014 shared WhatsApp number, per-user OpenClaw isolation",
+  "bin": {
+    "tenant": "bin/tenant.mjs"
+  },
+  "scripts": {
+    "start": "node scripts/start.mjs",
+    "dev": "node scripts/start.mjs --watch",
+    "mock": "node src/cli-mock.mjs",
+    "test": "node --import ./test/setup.mjs scripts/test.mjs",
+    "gate2": "node scripts/gate2-e2e.mjs",
+    "lint": "eslint .",
+    "pretest": "eslint .",
+    "docker:build:openclaw": "docker build -f Dockerfile.openclaw -t rocky-openclaw:2026.7.1-2 .",
+    "docker:connector:up": "node scripts/compose.mjs up -d --build connector-postgres composio-connector",
+    "gate:pool": "node scripts/gate-pool.mjs",
+    "gate3": "node scripts/gate3-twilio.mjs",
+    "twilio:simulate": "node scripts/twilio-simulate.mjs",
+    "gate3:local": "node scripts/gate3-local.mjs",
+    "integration:waiting": "node scripts/integration-waiting-states.mjs"
+  },
+  "engines": {
+    "node": ">=22.14"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.5"
+  }
+}

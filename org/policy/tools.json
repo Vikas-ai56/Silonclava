@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 2,
+  "defaultEffect": "deny",
+  "rules": {
+    "orgRegistryIsToolkitMaximum": true,
+    "nativeComposioMcpOnly": true,
+    "providerSpecificOauthInRocky": false,
+    "customRemoteMcp": false,
+    "toolFilters": false
+  }
+}

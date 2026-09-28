@@ -1,0 +1,1 @@
+"""Rocky connector-only sidecar."""

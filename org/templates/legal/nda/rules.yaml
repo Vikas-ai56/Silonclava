@@ -1,0 +1,39 @@
+# Org-policy rules for the BugleRock Mutual NDA template.
+#
+# Enforced by the nda-builder skill AFTER
+# JSON-schema validation. A violation here is a hard reject — the tool will
+# return a list of reasons and refuse to render. Edit before prod use.
+
+# Maximum allowed term in years. The JSON schema also caps this at 5, but
+# leaving the rule explicit so deployments can tighten it without touching
+# the schema (e.g. cap at 3 for a particular region).
+max_term_years: 5
+
+# Allowed governing-law jurisdictions. Must be a subset of the schema enum;
+# the renderer rejects any value not in this list.
+allowed_jurisdictions:
+  - Singapore
+  - India
+  - Delaware
+
+# Suggested BugleRock signatories, surfaced by describe() so the calling
+# agent has a sensible default to offer.
+#
+# ADVISORY ONLY — this is *not* an allowlist. Since BUG-211 the signatory is
+# a free-text render field (`signatory_name` / `signatory_title` in
+# schema.json); any name may be passed per-document and nothing here rejects
+# it. Adding a name below makes it easier to pick, not legal to sign.
+signatories:
+  - "Frederick Emerson"
+  - "Shyam Shenthar"
+
+# Fallbacks for optional schema fields the caller omitted. Applied by
+# field validation immediately before the docx is filled. Without an
+# entry here, an omitted optional field leaves its raw {{token}} visible in
+# the rendered document.
+#
+# These two reproduce the pre-BUG-211 output exactly: a blank signature rule
+# for wet / e-signature.
+render_defaults:
+  signatory_name: "________________________"
+  signatory_title: "_______________________"

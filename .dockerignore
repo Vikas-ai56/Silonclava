@@ -1,0 +1,18 @@
+# The tenant image needs only the Dockerfile and docker/ — never tenant data.
+# Without this, `docker build` reads every tenant's workspace, credentials and
+# session state into the build context, and fails outright on files the host
+# user cannot read.
+tenants/
+org/
+node_modules/
+.git/
+.env*
+ops/
+logs/
+*.log
+baileys_auth/
+.DS_Store
+test/
+scripts/
+docs/
+public/

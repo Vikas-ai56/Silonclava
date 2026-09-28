@@ -1,0 +1,67 @@
+# Build the per-tenant OpenClaw image, then run Rocky on the host with Docker CLI.
+#
+#   npm run docker:build:openclaw
+#   ROCKY_OPENCLAW_RUNTIME=docker ROCKY_CLI_HOST_FALLBACK=0 npm start
+#
+# Rocky stays on the host (Baileys needs a single linked device). It starts
+# containers named rocky-oc-<tenantId> via the Docker CLI.
+
+# The connector database identity (rift_connector database, role and password
+# default) is a persisted wire identifier, like `_riftVault` and the
+# `rift-<phone>` session key. Renaming it means a live role rename on the only
+# superuser of the instance, for no user-visible gain. See docs/DECISIONS.md.
+services:
+  connector-postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: rift_connector
+      POSTGRES_USER: rift_connector
+      POSTGRES_PASSWORD: ${ROCKY_CONNECTOR_DB_PASSWORD:-rift-connector-local}
+    volumes:
+      - connector-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rift_connector -d rift_connector"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  composio-connector:
+    build:
+      context: ./services/composio-connector
+    restart: unless-stopped
+    depends_on:
+      connector-postgres:
+        condition: service_healthy
+    ports:
+      # Host port is configurable: 4317 is the OTLP default and collides with
+      # other services on shared hosts (rocky-backend owns it on aws-server).
+      - "127.0.0.1:${ROCKY_CONNECTOR_PORT:-4317}:4317"
+    environment:
+      CONNECTOR_DATABASE_URL: postgresql://rift_connector:${ROCKY_CONNECTOR_DB_PASSWORD:-rift-connector-local}@connector-postgres:5432/rift_connector
+      CONNECTOR_COMPOSIO_API_KEY_FILE: /run/secrets/composio-project-key
+      CONNECTOR_SERVICE_PUBLIC_KEY_FILE: /run/secrets/rocky-assertion-public.pem
+      CONNECTOR_REGISTRY_PATH: /org/mcp/registry.json
+      CONNECTOR_ENTERPRISE_ORG_ID: ${ROCKY_ENTERPRISE_ORG_ID:-buglerock}
+      CONNECTOR_CALLBACK_URL: ${ROCKY_PUBLIC_BASE_URL:-http://127.0.0.1:8787}/connect/composio/callback
+    volumes:
+      - ./org/mcp/registry.json:/org/mcp/registry.json:ro
+      - ${ROCKY_PLATFORM_DIR:-./platform}/runtime-secrets/composio/project-key:/run/secrets/composio-project-key:ro
+      - ${ROCKY_PLATFORM_DIR:-./platform}/runtime-secrets/composio/assertion-public.pem:/run/secrets/rocky-assertion-public.pem:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4317/health', timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+  openclaw-image:
+    build:
+      context: .
+      dockerfile: Dockerfile.openclaw
+    image: rocky-openclaw:local
+    profiles: ["build"]
+    command: ["true"]
+
+volumes:
+  connector-postgres-data:

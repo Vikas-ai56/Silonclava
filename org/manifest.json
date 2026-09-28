@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "version": "2026.09.25-rocky.10",
+  "approval": {
+    "scope": "organization",
+    "status": "approved"
+  },
+  "files": {
+    "mcp/registry.json": "11a91fe5ccfd3d4f2ef11cb1b71a155b051aea83864b7e2eb459ea0c467310f6",
+    "policy/tools.json": "b3348d5e683c4f9956d680db6fdc1c17f96b3da376ae96349e2d70dfcc8d1f77",
+    "skills/organization-context/SKILL.md": "ef5814b02a18370f68fadea469e6ff7e8750fa2281cd27c79dbe779c123a1d6a",
+    "skills/persona-setup/reference/openclaw-agents-default.md": "0d30751170707050f41bff0911c8d9c7f9ac9a070d224eb12d9345dc8b8acf0b",
+    "skills/persona-setup/reference/openclaw-soul-default.md": "485554ca402ec730770f596a4ef0dfeb2b904998826510ae5d104ea04ca363ac",
+    "skills/persona-setup/reference/openclaw-tools-default.md": "eb3e33abaa76dbb8b36f82e6e6e6b1416d99f0884e9d365d381190cccc310ec8",
+    "skills/persona-setup/SKILL.md": "f9a3b1f93bfc08982e9aa94ac6ca1258262ff15c384ff6bd098b07e6489a029e",
+    "templates/legal/nda/README.md": "4c25c209d2caffd88ca129277c57d468df1114bb9bf8516d31a6704db3c28131",
+    "templates/legal/nda/rules.yaml": "d66408390602be1bc5a157fd0d2d3f9dd6139d6945dbd5585d60485912078a0f",
+    "templates/legal/nda/schema.json": "0783f7ce07c810c91de7b6c8e9ffb955b45e5b7c0a7d3bee6ead242f67ebffd7",
+    "templates/legal/nda/template.docx": "a46605f6199f8143179bec3003f8e14d6735c22ba064db918d9d3234209a6a6c",
+    "templates/workspace/AGENTS.md": "2977e8815c0189bd55d38de13745770516e53a9c10407c4f8eec6071491b9b30",
+    "templates/workspace/contacts.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "templates/workspace/IDENTITY.md": "92ca34dbac29f3b812ee4ae5db10281b21a52a65b6386ef79b82388770e84955",
+    "templates/workspace/SOUL.md": "7c06af5ec5d973191656410cb6a694004ae6b73c2b3ac831f6bbecc11874dea9",
+    "templates/workspace/USER.md": "ed81eab6790c2137881b748897a1099f150a227a1203e80bb83204eb2c6567a4",
+    "workspace/orgchart.md": "2ca488788423ae651185e090036a09068932fe1399b0839daa28de312bdde3ff"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "operatorPhones": ["15550000001"],
+  "allowFrom": ["15550000001"],
+  "operatorName": "Operator",
+  "operatorPlan": "claude",
+  "claudeBin": "claude",
+  "sessionIdleTtlMs": 10800000,
+  "operatorSessionIdleTtlMs": 86400000,
+  "publicBaseUrl": "https://YOUR-TUNNEL.example",
+  "notes": "Copy to rocky.config.json (gitignored). Put YOUR phone digits in operatorPhones/allowFrom. Never commit real phones, tokens, or tunnel URLs."
+}
